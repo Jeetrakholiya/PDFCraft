@@ -144,6 +144,14 @@ def get_template_html(filename: str) -> Optional[str]:
                         return content
             except Exception:
                 pass
+    try:
+        from backend.templates_fallback import EMBEDDED_INDEX_HTML, EMBEDDED_AUTH_HTML
+        if filename == "index.html":
+            return EMBEDDED_INDEX_HTML
+        elif filename == "auth.html":
+            return EMBEDDED_AUTH_HTML
+    except Exception:
+        pass
     return None
 
 # Routes
