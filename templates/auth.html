@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PDFCraft | Authentication & PDF Suite</title>
+  
+  <!-- Google Fonts & FontAwesome Icons -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <!-- App Styles -->
+  <link rel="stylesheet" href="/static/css/style.css?v=2">
+
+
+  <!-- Google Identity Services Library -->
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
+</head>
+<body class="pdfcraft-body">
+
+  <!-- Fluid Ink Animated Background (Electric-Blue Motion + Interactive Liquid Pointer) -->
+  <div class="fluid-ink-background" aria-hidden="true">
+    <div class="fib-layer fib-layer-a"></div>
+    <div class="fib-layer fib-layer-b"></div>
+    <div class="fib-layer fib-layer-cursor" id="fib-cursor-glow"></div>
+    <div class="fib-layer fib-layer-drift"></div>
+    <div class="fib-layer fib-layer-grain"></div>
+  </div>
+
+
+  <!-- Brand Navbar -->
+  <a href="/" class="craft-brand" style="padding: 20px 32px 0;">
+    <div class="brand-logo-icon">
+      <i class="fas fa-layer-group"></i>
+    </div>
+    <span class="brand-title">PDF<span class="brand-accent">Craft</span></span>
+  </a>
+
+  <!-- Auth Card Container -->
+  <div class="auth-container">
+    
+    <!-- Form Area (Logged Out) -->
+    <div id="auth-form-container" class="glass-card">
+      
+      <!-- Header -->
+      <div class="auth-header">
+        <h1 class="auth-title">Welcome to PDFCraft</h1>
+        <p class="auth-subtitle">Login or create an account to access PDF tools</p>
+      </div>
+
+      <!-- Tab Switcher -->
+      <div class="tabs-header">
+        <button id="tab-login" class="tab-btn active" type="button">
+          <i class="fas fa-sign-in-alt"></i> Sign In
+        </button>
+        <button id="tab-register" class="tab-btn" type="button">
+          <i class="fas fa-user-plus"></i> Create Account
+        </button>
+      </div>
+
+      <!-- Login Form -->
+      <form id="login-form">
+        <div class="form-group">
+          <label class="form-label" for="login-email">Email Address</label>
+          <div class="input-wrapper">
+            <i class="fas fa-envelope input-icon"></i>
+            <input type="email" id="login-email" class="form-input" placeholder="name@example.com" required>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="login-password">Password</label>
+          <div class="input-wrapper">
+            <i class="fas fa-lock input-icon"></i>
+            <input type="password" id="login-password" class="form-input" placeholder="••••••••" required>
+            <i class="fas fa-eye toggle-password" data-target="login-password"></i>
+          </div>
+        </div>
+
+        <button type="submit" class="btn-primary">
+          <span>Sign In with JWT</span>
+          <i class="fas fa-arrow-right"></i>
+        </button>
+      </form>
+
+      <!-- Register Form -->
+      <form id="register-form" style="display: none;">
+        <div class="form-group">
+          <label class="form-label" for="register-name">Full Name</label>
+          <div class="input-wrapper">
+            <i class="fas fa-user input-icon"></i>
+            <input type="text" id="register-name" class="form-input" placeholder="John Doe" required>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="register-email">Email Address</label>
+          <div class="input-wrapper">
+            <i class="fas fa-envelope input-icon"></i>
+            <input type="email" id="register-email" class="form-input" placeholder="name@example.com" required>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="register-password">Password (min 6 chars)</label>
+          <div class="input-wrapper">
+            <i class="fas fa-lock input-icon"></i>
+            <input type="password" id="register-password" class="form-input" placeholder="••••••••" minlength="6" required>
+            <i class="fas fa-eye toggle-password" data-target="register-password"></i>
+          </div>
+        </div>
+
+        <button type="submit" class="btn-primary">
+          <span>Create Free Account</span>
+          <i class="fas fa-check"></i>
+        </button>
+      </form>
+
+      <!-- Divider -->
+      <div class="divider">
+        <span>or sign in with</span>
+      </div>
+
+      <!-- Google OAuth Options -->
+      <div class="google-btn-container">
+        
+        <!-- Standard Google One-Tap / OAuth Button Placeholder -->
+        <div id="g_id_onload"
+             data-client_id="YOUR_GOOGLE_CLIENT_ID.apps.googleusercontent.com"
+             data-callback="handleGoogleCredentialResponse"
+             data-auto_select="false">
+        </div>
+        <div class="g_id_signin" data-type="standard" data-shape="rectangular" data-theme="filled_blue" data-text="signin_with" data-size="large" data-logo_alignment="left"></div>
+
+        <!-- Google OAuth Instant Test Button (Works out of the box without setup!) -->
+        <button id="btn-google-demo" class="btn-google-demo" type="button">
+          <i class="fab fa-google" style="color: #ea4335;"></i>
+          <span>Instant Google OAuth Sign-In (Demo Mode)</span>
+        </button>
+      </div>
+
+    </div>
+
+    <!-- User Session Dashboard (Logged In) -->
+    <div id="dashboard-container" class="glass-card dashboard-card" style="display: none;">
+      <img id="user-avatar-img" src="" alt="User Avatar" class="user-avatar">
+      <h2 id="user-display-name" class="auth-title">User</h2>
+      <p id="user-display-email" class="auth-subtitle">email@domain.com</p>
+      
+      <div style="margin: 16px 0;">
+        <span id="user-provider-badge" class="jwt-badge">
+          <i class="fas fa-shield-alt"></i> JWT Authenticated
+        </span>
+      </div>
+
+      <div style="text-align: left; margin-bottom: 6px;" class="form-label">
+        <i class="fas fa-key"></i> Active JWT Access Token:
+      </div>
+      <div id="token-display" class="token-box">
+        Loading token...
+      </div>
+
+      <button id="copy-token-btn" class="btn-secondary" type="button">
+        <i class="fas fa-copy"></i> Copy Access Token
+      </button>
+
+      <button id="logout-btn" class="btn-primary" style="margin-top: 12px; background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);">
+        <i class="fas fa-sign-out-alt"></i> Sign Out
+      </button>
+    </div>
+
+  </div>
+
+  <script src="/static/js/auth.js"></script>
+</body>
+</html>
