@@ -3,7 +3,20 @@ from fastapi import FastAPI, HTTPException, Depends, Header, Request, status
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import HTMLResponse
+from fastapi.responses import HTMLResponse, FileResponse
+
+@app.get("/static/{filepath:path}")
+def serve_static_file(filepath: str):
+    candidates = [
+        os.path.join(BASE_DIR, "static", filepath),
+        os.path.join(os.getcwd(), "static", filepath),
+        os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "static", filepath),
+        os.path.join(os.path.dirname(os.path.abspath(__file__)), "static", filepath)
+    ]
+    for p in candidates:
+        if os.path.exists(p) and os.path.isfile(p):
+            return FileResponse(p)
+    raise HTTPException(status_code=404, detail=f"Static file '{filepath}' not found")
 from pydantic import BaseModel, EmailStr
 from typing import Optional
 

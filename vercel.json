@@ -1,6 +1,15 @@
 {
   "version": 2,
+  "functions": {
+    "api/index.py": {
+      "includeFiles": "static/**:templates/**"
+    }
+  },
   "routes": [
+    {
+      "src": "/static/(.*)",
+      "dest": "/static/$1"
+    },
     {
       "src": "/(.*)",
       "dest": "api/index.py"
