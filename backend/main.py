@@ -5,7 +5,7 @@ from fastapi.templating import Jinja2Templates
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import HTMLResponse, FileResponse
 
-from pydantic import BaseModel, EmailStr
+from pydantic import BaseModel
 from typing import Optional
 
 from backend.database import init_db, get_user_by_email, get_user_by_id, create_user
@@ -88,18 +88,18 @@ else:
 # Pydantic Schemas
 class RegisterSchema(BaseModel):
     full_name: str
-    email: EmailStr
+    email: str
     password: str
 
 class LoginSchema(BaseModel):
-    email: EmailStr
+    email: str
     password: str
 
 class GoogleAuthSchema(BaseModel):
     credential: str
 
 class DemoGoogleAuthSchema(BaseModel):
-    email: EmailStr
+    email: str
     full_name: str
     picture: Optional[str] = None
 
