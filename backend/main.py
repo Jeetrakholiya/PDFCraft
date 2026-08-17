@@ -88,6 +88,8 @@ def get_current_user(authorization: Optional[str] = Header(None)):
 
 # Routes
 @app.get("/")
+@app.get("/api")
+@app.get("/api/index")
 def read_root(request: Request):
     return templates.TemplateResponse(request=request, name="index.html")
 
