@@ -1,9 +1,13 @@
 import sqlite3
 import os
+import tempfile
 from pathlib import Path
 from typing import Optional, Dict, Any
 
-DB_PATH = Path(__file__).parent.parent / "pdf_app.db"
+if os.environ.get("VERCEL") or not os.access(Path(__file__).parent.parent, os.W_OK):
+    DB_PATH = Path(tempfile.gettempdir()) / "pdf_app.db"
+else:
+    DB_PATH = Path(__file__).parent.parent / "pdf_app.db"
 
 def get_db_connection():
     conn = sqlite3.connect(DB_PATH)

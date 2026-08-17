@@ -33,9 +33,15 @@ STATIC_DIR = os.path.join(BASE_DIR, "static")
 TEMPLATES_DIR = os.path.join(BASE_DIR, "templates")
 
 if not os.path.exists(STATIC_DIR):
-    os.makedirs(STATIC_DIR, exist_ok=True)
+    try:
+        os.makedirs(STATIC_DIR, exist_ok=True)
+    except Exception:
+        pass
 if not os.path.exists(TEMPLATES_DIR):
-    os.makedirs(TEMPLATES_DIR, exist_ok=True)
+    try:
+        os.makedirs(TEMPLATES_DIR, exist_ok=True)
+    except Exception:
+        pass
 
 app.mount("/static", StaticFiles(directory=STATIC_DIR), name="static")
 templates = Jinja2Templates(directory=TEMPLATES_DIR)
