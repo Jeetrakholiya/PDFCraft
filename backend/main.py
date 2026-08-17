@@ -98,27 +98,49 @@ def get_current_user(authorization: Optional[str] = Header(None)):
         )
     return user
 
+def get_template_html(filename: str) -> str:
+    candidates = [
+        os.path.join(BASE_DIR, "templates", filename),
+        os.path.join(os.getcwd(), "templates", filename),
+        os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "templates", filename),
+        os.path.join(os.path.dirname(os.path.abspath(__file__)), "templates", filename)
+    ]
+    for p in candidates:
+        if os.path.exists(p):
+            try:
+                with open(p, "r", encoding="utf-8") as f:
+                    return f.read()
+            except Exception:
+                pass
+    return ""
+
 # Routes
 @app.get("/")
 @app.get("/api")
 @app.get("/api/index")
 def read_root(request: Request):
+    html_content = get_template_html("index.html")
+    if html_content:
+        return HTMLResponse(content=html_content)
     if templates and TEMPLATES_DIR and os.path.exists(os.path.join(TEMPLATES_DIR, "index.html")):
         try:
             return templates.TemplateResponse(request=request, name="index.html")
         except Exception:
             pass
-    return HTMLResponse("<!DOCTYPE html><html><head><title>PDFCraft</title></head><body><h1>PDFCraft Backend API Online</h1><p>Serverless environment active.</p></body></html>")
+    return HTMLResponse("<!DOCTYPE html><html><head><title>PDFCraft</title></head><body><h1>PDFCraft Backend Active</h1></body></html>")
 
 @app.get("/auth")
 @app.get("/login")
 def read_auth(request: Request):
+    html_content = get_template_html("auth.html")
+    if html_content:
+        return HTMLResponse(content=html_content)
     if templates and TEMPLATES_DIR and os.path.exists(os.path.join(TEMPLATES_DIR, "auth.html")):
         try:
             return templates.TemplateResponse(request=request, name="auth.html")
         except Exception:
             pass
-    return HTMLResponse("<!DOCTYPE html><html><head><title>PDFCraft Auth</title></head><body><h1>PDFCraft Authentication API</h1></body></html>")
+    return HTMLResponse("<!DOCTYPE html><html><head><title>PDFCraft Auth</title></head><body><h1>PDFCraft Auth</h1></body></html>")
 
 @app.post("/api/auth/register")
 def register(data: RegisterSchema):
