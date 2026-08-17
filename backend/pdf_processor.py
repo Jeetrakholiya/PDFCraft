@@ -3,7 +3,10 @@ import io
 import zipfile
 from typing import List, Optional
 from pypdf import PdfReader, PdfWriter
-from pdf2docx import Converter
+try:
+    from pdf2docx import Converter
+except Exception:
+    Converter = None
 from PIL import Image
 import docx
 import pptx
