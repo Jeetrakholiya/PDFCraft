@@ -50,7 +50,9 @@ def serve_static_file(filepath: str):
         os.path.join(BASE_DIR, "static", filepath),
         os.path.join(os.getcwd(), "static", filepath),
         os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "static", filepath),
-        os.path.join(os.path.dirname(os.path.abspath(__file__)), "static", filepath)
+        os.path.join(os.path.dirname(os.path.abspath(__file__)), "static", filepath),
+        os.path.join("/var/task", "static", filepath),
+        os.path.join("/var/task", filepath)
     ]
     for p in candidates:
         if os.path.exists(p) and os.path.isfile(p):
@@ -124,21 +126,25 @@ def get_current_user(authorization: Optional[str] = Header(None)):
         )
     return user
 
-def get_template_html(filename: str) -> str:
+def get_template_html(filename: str) -> Optional[str]:
     candidates = [
         os.path.join(BASE_DIR, "templates", filename),
         os.path.join(os.getcwd(), "templates", filename),
         os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "templates", filename),
-        os.path.join(os.path.dirname(os.path.abspath(__file__)), "templates", filename)
+        os.path.join(os.path.dirname(os.path.abspath(__file__)), "templates", filename),
+        os.path.join("/var/task", "templates", filename),
+        os.path.join("/var/task", filename)
     ]
     for p in candidates:
-        if os.path.exists(p):
+        if os.path.exists(p) and os.path.isfile(p):
             try:
                 with open(p, "r", encoding="utf-8") as f:
-                    return f.read()
+                    content = f.read()
+                    if content and len(content.strip()) > 0:
+                        return content
             except Exception:
                 pass
-    return ""
+    return None
 
 # Routes
 @app.get("/")
