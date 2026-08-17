@@ -15,21 +15,24 @@ def get_db_connection():
     return conn
 
 def init_db():
-    conn = get_db_connection()
-    cursor = conn.cursor()
-    cursor.execute("""
-        CREATE TABLE IF NOT EXISTS users (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            email TEXT UNIQUE NOT NULL,
-            full_name TEXT NOT NULL,
-            hashed_password TEXT,
-            auth_provider TEXT DEFAULT 'email', -- 'email' or 'google'
-            picture TEXT,
-            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-        )
-    """)
-    conn.commit()
-    conn.close()
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        cursor.execute("""
+            CREATE TABLE IF NOT EXISTS users (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                email TEXT UNIQUE NOT NULL,
+                full_name TEXT NOT NULL,
+                hashed_password TEXT,
+                auth_provider TEXT DEFAULT 'email', -- 'email' or 'google'
+                picture TEXT,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            )
+        """)
+        conn.commit()
+        conn.close()
+    except Exception:
+        pass
 
 def get_user_by_email(email: str) -> Optional[Dict[str, Any]]:
     conn = get_db_connection()

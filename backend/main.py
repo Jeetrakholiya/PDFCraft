@@ -3,6 +3,7 @@ from fastapi import FastAPI, HTTPException, Depends, Header, Request, status
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import HTMLResponse
 from pydantic import BaseModel, EmailStr
 from typing import Optional
 
@@ -27,7 +28,7 @@ app.add_middleware(
 # Initialize Database tables
 init_db()
 
-# Mounting static files and templates
+# Mounting static files and templates safely
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 STATIC_DIR = os.path.join(BASE_DIR, "static")
 TEMPLATES_DIR = os.path.join(BASE_DIR, "templates")
@@ -42,8 +43,19 @@ if not os.path.exists(STATIC_DIR):
     if os.path.exists(cwd_static):
         STATIC_DIR = cwd_static
 
-app.mount("/static", StaticFiles(directory=STATIC_DIR), name="static")
-templates = Jinja2Templates(directory=TEMPLATES_DIR)
+if os.path.exists(STATIC_DIR):
+    try:
+        app.mount("/static", StaticFiles(directory=STATIC_DIR), name="static")
+    except Exception:
+        pass
+
+if os.path.exists(TEMPLATES_DIR):
+    try:
+        templates = Jinja2Templates(directory=TEMPLATES_DIR)
+    except Exception:
+        templates = None
+else:
+    templates = None
 
 # Pydantic Schemas
 class RegisterSchema(BaseModel):
@@ -91,12 +103,22 @@ def get_current_user(authorization: Optional[str] = Header(None)):
 @app.get("/api")
 @app.get("/api/index")
 def read_root(request: Request):
-    return templates.TemplateResponse(request=request, name="index.html")
+    if templates and TEMPLATES_DIR and os.path.exists(os.path.join(TEMPLATES_DIR, "index.html")):
+        try:
+            return templates.TemplateResponse(request=request, name="index.html")
+        except Exception:
+            pass
+    return HTMLResponse("<!DOCTYPE html><html><head><title>PDFCraft</title></head><body><h1>PDFCraft Backend API Online</h1><p>Serverless environment active.</p></body></html>")
 
 @app.get("/auth")
 @app.get("/login")
 def read_auth(request: Request):
-    return templates.TemplateResponse(request=request, name="auth.html")
+    if templates and TEMPLATES_DIR and os.path.exists(os.path.join(TEMPLATES_DIR, "auth.html")):
+        try:
+            return templates.TemplateResponse(request=request, name="auth.html")
+        except Exception:
+            pass
+    return HTMLResponse("<!DOCTYPE html><html><head><title>PDFCraft Auth</title></head><body><h1>PDFCraft Authentication API</h1></body></html>")
 
 @app.post("/api/auth/register")
 def register(data: RegisterSchema):
